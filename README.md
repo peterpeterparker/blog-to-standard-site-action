@@ -107,8 +107,8 @@ jobs:
         with:
           blog_posts_path: "src/blog"
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          at_proto_did: "did:plc:xxxxxxxxxxxxxxxxxxxxxxxx"
           at_proto_app_password: ${{ secrets.AT_PROTO_APP_PASSWORD }}
+          at_proto_did: "did:plc:xxxxxxxxxxxxxxxxxxxxxxxx"
           at_proto_publication_rkey: "your-publication-rkey"
 ```
 
