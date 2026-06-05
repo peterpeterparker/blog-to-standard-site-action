@@ -2,7 +2,7 @@ import { describe, expect, it, beforeEach } from "bun:test";
 import { writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { ZodError } from "zod";
-import { Blog } from "../../src/blog/blog.ts";
+import { Blog, NoBlogPostsError } from "../../src/blog/blog.ts";
 
 const TEST_DIR = join(process.cwd(), "__fixtures__", "blog");
 
@@ -48,19 +48,19 @@ describe("Blog", () => {
       expect(result.err).toBeInstanceOf(ZodError);
     });
 
-    it("should return empty posts if no .md files match blog path", async () => {
+    it("should return error if no .md files match blog path", async () => {
       const result = await Blog.create().build({
         files: ["src/lib/utils.ts", "__fixtures__/blog/notes.txt"],
       });
 
-      expect(result.status).toBe("success");
+      expect(result.status).toBe("error");
 
-      if (result.status !== "success") {
+      if (result.status !== "error") {
         expect(true).toBeFalsy();
         return;
       }
 
-      expect(result.result.posts).toHaveLength(0);
+      expect(result.err).toBeInstanceOf(NoBlogPostsError);
     });
 
     it("should return blog post with path, title and description", async () => {
@@ -87,21 +87,21 @@ describe("Blog", () => {
       expect(result.result.posts[0]?.publishedAt).toBeDefined();
     });
 
-    it("should skip posts with missing frontmatter fields", async () => {
+    it("should return error if blog post has no valid frontmatter", async () => {
       await writeFile(join(TEST_DIR, "invalid.md"), "# No frontmatter");
 
       const result = await Blog.create().build({
         files: ["__fixtures__/blog/invalid.md"],
       });
 
-      expect(result.status).toBe("success");
+      expect(result.status).toBe("error");
 
-      if (result.status !== "success") {
+      if (result.status !== "error") {
         expect(true).toBeFalsy();
         return;
       }
 
-      expect(result.result.posts).toHaveLength(0);
+      expect(result.err).toBeInstanceOf(NoBlogPostsError);
     });
 
     it("should return multiple blog posts", async () => {
@@ -152,6 +152,23 @@ describe("Blog", () => {
       const publishedAt = result.result.posts[0]?.publishedAt ?? "";
       expect(publishedAt >= before).toBe(true);
       expect(publishedAt <= after).toBe(true);
+    });
+
+    it("should return error if blog posts have no valid frontmatter", async () => {
+      await writeFile(join(TEST_DIR, "no-meta.md"), "# No frontmatter");
+
+      const result = await Blog.create().build({
+        files: ["__fixtures__/blog/no-meta.md"],
+      });
+
+      expect(result.status).toBe("error");
+
+      if (result.status !== "error") {
+        expect(true).toBeFalsy();
+        return;
+      }
+
+      expect(result.err).toBeInstanceOf(NoBlogPostsError);
     });
   });
 });

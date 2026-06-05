@@ -21,6 +21,8 @@ export const run = async (): Promise<Result<void>> => {
     return { status: "success", result: undefined };
   }
 
+  // 2. Extract metadata for the posts
+
   const blogPostsResult = await Blog.create().build({ files });
 
   if (blogPostsResult.status === "error") {
@@ -29,7 +31,7 @@ export const run = async (): Promise<Result<void>> => {
 
   const { result: blog } = blogPostsResult;
 
-  // 2. Generate AtProto records
+  // 3. Generate AtProto records
 
   const recordsResult = await AtProto.create().generateRecords(blog);
 

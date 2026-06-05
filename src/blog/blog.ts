@@ -1,5 +1,5 @@
 import type { Result } from "../common/types.ts";
-import { NotEmptyStringSchema } from "../common/asserts.ts";
+import { notEmptyString, NotEmptyStringSchema } from "../common/asserts.ts";
 import { extname, join } from "node:path";
 import { envRepoRoot } from "../env.ts";
 import type { RelativePath } from "../common/files.ts";
@@ -9,6 +9,8 @@ import {
   type BlogPosts,
   BlogPostSchema,
 } from "../common/blog.ts";
+
+export class NoBlogPostsError extends Error {}
 
 export class Blog {
   private constructor() {}
@@ -60,9 +62,15 @@ export class Blog {
     };
 
     try {
-      const posts = await Promise.all(relativePaths.map(buildBlogPost));
+      const builtPosts = await Promise.all(relativePaths.map(buildBlogPost));
 
-      return { status: "success", result: posts.filter((post) => post !== undefined) };
+      const posts = builtPosts.filter((post) => post !== undefined);
+
+      if (posts.length === 0) {
+        return { status: "error", err: new NoBlogPostsError("No blog posts metadata found.") };
+      }
+
+      return { status: "success", result: posts };
     } catch (err: unknown) {
       return { status: "error", err };
     }
@@ -81,16 +89,16 @@ export class Blog {
     // Remove frontmatter YAML - https://stackoverflow.com/a/33537453/5404186
     const metadataRegex = /^---((.|\n)*?)---/g;
 
-    const rawMetdata = metadataRegex
+    const rawMetadata = metadataRegex
       .exec(content)?.[1]
       ?.split("\n")
       ?.filter((value: string) => value !== "");
 
-    return rawMetdata?.reduce<Partial<BlogPost>>(
+    return rawMetadata?.reduce<Partial<BlogPost>>(
       (acc: Partial<BlogPost>, value: string) => {
-        const [key, ...rest] = value.split(":");
+        const [key, ...rest] = value.trim().split(":");
 
-        if (key === undefined) {
+        if (!notEmptyString(key)) {
           return acc;
         }
 
