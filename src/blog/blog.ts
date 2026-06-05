@@ -64,7 +64,7 @@ export class Blog {
     try {
       const builtPosts = await Promise.all(relativePaths.map(buildBlogPost));
 
-      console.log(builtPosts);
+      console.log("Build posts", builtPosts);
 
       const posts = builtPosts.filter((post) => post !== undefined);
 
@@ -96,7 +96,7 @@ export class Blog {
       ?.split("\n")
       ?.filter((value: string) => value !== "");
 
-    console.log(rawMetadata);
+    console.log("Raw metadata", rawMetadata);
 
     return rawMetadata?.reduce<Partial<BlogPost>>(
       (acc: Partial<BlogPost>, value: string) => {
