@@ -107,7 +107,7 @@ jobs:
         with:
           blog_posts_path: "src/blog"
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          at_proto_did: ${{ secrets.AT_PROTO_DID }}
+          at_proto_did: "did:plc:xxxxxxxxxxxxxxxxxxxxxxxx"
           at_proto_app_password: ${{ secrets.AT_PROTO_APP_PASSWORD }}
           at_proto_publication_rkey: "your-publication-rkey"
 ```
@@ -126,13 +126,12 @@ jobs:
 
 Add these to your repository under **Settings -> Secrets -> Actions**:
 
-| Secret                  | Description                                               |
-| ----------------------- | --------------------------------------------------------- |
-| `AT_PROTO_DID`          | Your AT Protocol DID (`did:plc:xxxxxxxxxxxxxxxxxxxxxxxx`) |
-| `AT_PROTO_APP_PASSWORD` | Your Bluesky app password                                 |
+| Secret                  | Description               |
+| ----------------------- | ------------------------- |
+| `AT_PROTO_APP_PASSWORD` | Your Bluesky app password |
 
 > [!TIP]
-> `at_proto_publication_rkey` is not sensitive -- you can provide it directly in your workflow file.
+> `at_proto_publication_rkey` and `at_proto_did` are public - you can provide them directly in your workflow file.
 
 ## License
 
