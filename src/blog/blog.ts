@@ -86,18 +86,23 @@ export class Blog {
       ?.split("\n")
       ?.filter((value: string) => value !== "");
 
-    return rawMetdata?.reduce<Partial<BlogPost>>((acc: Partial<BlogPost>, value: string) => {
-      const [key, ...rest] = value.split(":");
+    return rawMetdata?.reduce<Partial<BlogPost>>(
+      (acc: Partial<BlogPost>, value: string) => {
+        const [key, ...rest] = value.split(":");
 
-      if (key === undefined) {
-        return acc;
-      }
+        if (key === undefined) {
+          return acc;
+        }
 
-      const obj: Record<string, string> = {};
-      obj[key] = rest.join(":").replace(/"/g, "").trim();
+        const obj: Record<string, string> = {};
+        obj[key] = rest.join(":").replace(/"/g, "").trim();
 
-      return { ...acc, ...obj };
-    }, {});
+        return { ...acc, ...obj };
+      },
+      {
+        publishedAt: new Date().toISOString(),
+      },
+    );
   }
 
   async #findLatestBlogPosts({

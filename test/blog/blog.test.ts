@@ -6,10 +6,10 @@ import { Blog } from "../../src/blog/blog.ts";
 
 const TEST_DIR = join(process.cwd(), "__fixtures__", "blog");
 
-const frontmatter = (path: string, title: string, description: string) => `---
+const frontmatter = (path: string, title: string, description: string, date?: string) => `---
 path: "${path}"
 title: "${title}"
-description: "${description}"
+description: "${description}"${date ? `\ndate: "${date}"` : ""}
 ---`;
 
 describe("Blog", () => {
@@ -84,6 +84,7 @@ describe("Blog", () => {
       expect(result.result.posts[0]?.path).toBe("/blog/hello-world");
       expect(result.result.posts[0]?.title).toBe("Hello World");
       expect(result.result.posts[0]?.description).toBe("A hello world post");
+      expect(result.result.posts[0]?.publishedAt).toBeDefined();
     });
 
     it("should skip posts with missing frontmatter fields", async () => {
@@ -125,6 +126,32 @@ describe("Blog", () => {
       }
 
       expect(result.result.posts).toHaveLength(2);
+    });
+
+    it("should use current date as publishedAt", async () => {
+      await writeFile(
+        join(TEST_DIR, "dated.md"),
+        frontmatter("/blog/dated", "Dated Post", "A dated post"),
+      );
+
+      const before = new Date().toISOString();
+
+      const result = await Blog.create().build({
+        files: ["__fixtures__/blog/dated.md"],
+      });
+
+      const after = new Date().toISOString();
+
+      expect(result.status).toBe("success");
+
+      if (result.status !== "success") {
+        expect(true).toBeFalsy();
+        return;
+      }
+
+      const publishedAt = result.result.posts[0]?.publishedAt ?? "";
+      expect(publishedAt >= before).toBe(true);
+      expect(publishedAt <= after).toBe(true);
     });
   });
 });
