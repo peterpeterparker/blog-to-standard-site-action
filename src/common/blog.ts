@@ -5,6 +5,7 @@ export const BlogPostSchema = z.strictObject({
   path: NotEmptyStringSchema,
   title: NotEmptyStringSchema,
   description: NotEmptyStringSchema,
+  publishedAt: z.iso.datetime(),
 });
 
 export const BlogPostsSchema = z.array(BlogPostSchema);

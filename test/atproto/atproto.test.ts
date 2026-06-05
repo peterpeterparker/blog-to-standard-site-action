@@ -9,8 +9,18 @@ import type { Blog } from "../../src/common/blog.ts";
 describe("AtProto", () => {
   const mockBlog: Blog = {
     posts: [
-      { path: "/blog/post-one", title: "Post One", description: "First post" },
-      { path: "/blog/post-two", title: "Post Two", description: "Second post" },
+      {
+        path: "/blog/post-one",
+        title: "Post One",
+        description: "First post",
+        publishedAt: "2026-06-05T00:00:00.000Z",
+      },
+      {
+        path: "/blog/post-two",
+        title: "Post Two",
+        description: "Second post",
+        publishedAt: "2026-06-05T00:00:00.000Z",
+      },
     ],
   };
 
@@ -147,6 +157,7 @@ describe("AtProto", () => {
       expect(body.record.site).toBe(
         "at://did:plc:fxmgj7lnas3ewnc3hmpx2vg6/site.standard.publication/3mnjy5srkem2h",
       );
+      expect(body.record.publishedAt).toBe("2026-06-05T00:00:00.000Z");
     });
   });
 });

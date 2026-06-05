@@ -42,7 +42,6 @@ export const AtProtoCreateRecordCodec = z.codec(AtProtoCreateRecordArgsSchema, z
         $type: "site.standard.document",
         site: `at://${did}/site.standard.publication/${publicationRkey}`,
         ...blogPost,
-        publishedAt: new Date().toISOString(),
       },
     }),
   encode: (json) => JSON.parse(json),
