@@ -1,5 +1,5 @@
 import type { Result } from "../common/types.ts";
-import { NotEmptyStringSchema } from "../common/asserts.ts";
+import {notEmptyString, NotEmptyStringSchema} from "../common/asserts.ts";
 import { extname, join } from "node:path";
 import { envRepoRoot } from "../env.ts";
 import type { RelativePath } from "../common/files.ts";
@@ -100,14 +100,14 @@ export class Blog {
 
     return rawMetadata?.reduce<Partial<BlogPost>>(
       (acc: Partial<BlogPost>, value: string) => {
-        const [key, ...rest] = value.split(":");
+        const [key, ...rest] = value.trim().split(":");
 
-        if (key === undefined) {
+        if (!notEmptyString(key)) {
           return acc;
         }
 
         const obj: Record<string, string> = {};
-        obj[key.trim()] = rest.join(":").replace(/"/g, "").trim();
+        obj[key] = rest.join(":").replace(/"/g, "").trim();
 
         return { ...acc, ...obj };
       },

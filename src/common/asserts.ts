@@ -2,7 +2,7 @@ import { z } from "zod";
 
 export const NotEmptyStringSchema = z.string().trim().min(1, { message: "Required" });
 
-const notEmptyString = (value: string | undefined | null): value is string => {
+export const notEmptyString = (value: string | undefined | null): value is string => {
   const { success } = NotEmptyStringSchema.safeParse(value);
   return success;
 };
