@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { NotEmptyStringSchema } from "./asserts.ts";
 
-export const BlogPostSchema = z.strictObject({
+export const BlogPostSchema = z.object({
   path: NotEmptyStringSchema,
   title: NotEmptyStringSchema,
   description: NotEmptyStringSchema,
