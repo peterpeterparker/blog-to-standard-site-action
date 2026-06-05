@@ -6,7 +6,11 @@ import { AtProto } from "./atproto/atproto.ts";
 export const run = async (): Promise<Result<void>> => {
   // 1. Collect new blog posts from GitHub commit
 
+  console.log('Running...');
+
   const addedFilesResult = await GitHub.create().findAddedFiles();
+
+  console.log("Found:", addedFilesResult);
 
   if (addedFilesResult.status === "error") {
     return addedFilesResult;
