@@ -1,5 +1,5 @@
 import type { Result } from "../common/types.ts";
-import {notEmptyString, NotEmptyStringSchema} from "../common/asserts.ts";
+import { notEmptyString, NotEmptyStringSchema } from "../common/asserts.ts";
 import { extname, join } from "node:path";
 import { envRepoRoot } from "../env.ts";
 import type { RelativePath } from "../common/files.ts";
@@ -64,8 +64,6 @@ export class Blog {
     try {
       const builtPosts = await Promise.all(relativePaths.map(buildBlogPost));
 
-      console.log("Build posts", builtPosts);
-
       const posts = builtPosts.filter((post) => post !== undefined);
 
       if (posts.length === 0) {
@@ -95,8 +93,6 @@ export class Blog {
       .exec(content)?.[1]
       ?.split("\n")
       ?.filter((value: string) => value !== "");
-
-    console.log("Raw metadata", rawMetadata);
 
     return rawMetadata?.reduce<Partial<BlogPost>>(
       (acc: Partial<BlogPost>, value: string) => {
