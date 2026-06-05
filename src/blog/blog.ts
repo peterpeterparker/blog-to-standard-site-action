@@ -63,6 +63,9 @@ export class Blog {
 
     try {
       const builtPosts = await Promise.all(relativePaths.map(buildBlogPost));
+
+      console.log(builtPosts);
+
       const posts = builtPosts.filter((post) => post !== undefined);
 
       if (posts.length === 0) {
@@ -88,12 +91,14 @@ export class Blog {
     // Remove frontmatter YAML - https://stackoverflow.com/a/33537453/5404186
     const metadataRegex = /^---((.|\n)*?)---/g;
 
-    const rawMetdata = metadataRegex
+    const rawMetadata = metadataRegex
       .exec(content)?.[1]
       ?.split("\n")
       ?.filter((value: string) => value !== "");
 
-    return rawMetdata?.reduce<Partial<BlogPost>>(
+    console.log(rawMetadata);
+
+    return rawMetadata?.reduce<Partial<BlogPost>>(
       (acc: Partial<BlogPost>, value: string) => {
         const [key, ...rest] = value.split(":");
 
