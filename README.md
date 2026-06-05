@@ -68,7 +68,7 @@ Before setting up this action you'll need:
 
 ### Bluesky app password
 
-1. Go to **Settings -> App Passwords** in Bluesky
+1. Go to **Settings -> Privacy and Security -> App Passwords** in Bluesky
 2. Create a new app password and copy it
 
 ### Blog post frontmatter
@@ -126,10 +126,10 @@ jobs:
 
 Add these to your repository under **Settings -> Secrets -> Actions**:
 
-| Secret                  | Description               |
-| ----------------------- | ------------------------- |
-| `AT_PROTO_DID`          | Your AT Protocol DID      |
-| `AT_PROTO_APP_PASSWORD` | Your Bluesky app password |
+| Secret                  | Description                                               |
+| ----------------------- | --------------------------------------------------------- |
+| `AT_PROTO_DID`          | Your AT Protocol DID (`did:plc:xxxxxxxxxxxxxxxxxxxxxxxx`) |
+| `AT_PROTO_APP_PASSWORD` | Your Bluesky app password                                 |
 
 > [!TIP]
 > `at_proto_publication_rkey` is not sensitive -- you can provide it directly in your workflow file.
