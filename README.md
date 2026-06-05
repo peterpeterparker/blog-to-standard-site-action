@@ -117,10 +117,10 @@ jobs:
 | Input                       | Required | Description                                                                                                          |
 | --------------------------- | -------- | -------------------------------------------------------------------------------------------------------------------- |
 | `blog_posts_path`           | yes      | Path to your blog posts directory (e.g. `src/blog`)                                                                  |
-| `at_proto_did`              | yes      | Your AT Protocol Decentralized Identifier (DID)                                                                      |
-| `at_proto_app_password`     | yes      | Your Bluesky app password                                                                                            |
-| `at_proto_publication_rkey` | yes      | Record key of your `site.standard.publication` record                                                                |
 | `github_token`              | no       | Optional GitHub token for fetching commit info from the GitHub API. Useful for private repos or to avoid rate limits |
+| `at_proto_app_password`     | yes      | Your Bluesky app password                                                                                            |
+| `at_proto_did`              | yes      | Your AT Protocol Decentralized Identifier (DID)                                                                      |
+| `at_proto_publication_rkey` | yes      | Record key of your `site.standard.publication` record                                                                |
 
 ## Secrets
 
