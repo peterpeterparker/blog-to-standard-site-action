@@ -6,7 +6,7 @@ import { AtProto } from "./atproto/atproto.ts";
 export const run = async (): Promise<Result<void>> => {
   // 1. Collect new blog posts from GitHub commit
 
-  console.log('Running...');
+  console.log("Running...");
 
   const addedFilesResult = await GitHub.create().findAddedFiles();
 
@@ -25,6 +25,8 @@ export const run = async (): Promise<Result<void>> => {
     return { status: "success", result: undefined };
   }
 
+  // 2. Extract metadata for the posts
+
   const blogPostsResult = await Blog.create().build({ files });
 
   console.log("Content:", blogPostsResult);
@@ -35,7 +37,7 @@ export const run = async (): Promise<Result<void>> => {
 
   const { result: blog } = blogPostsResult;
 
-  // 2. Generate AtProto records
+  // 3. Generate AtProto records
 
   const recordsResult = await AtProto.create().generateRecords(blog);
 

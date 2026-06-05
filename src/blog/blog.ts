@@ -10,6 +10,8 @@ import {
   BlogPostSchema,
 } from "../common/blog.ts";
 
+export class NoBlogPostsError extends Error {}
+
 export class Blog {
   private constructor() {}
 
@@ -60,9 +62,14 @@ export class Blog {
     };
 
     try {
-      const posts = await Promise.all(relativePaths.map(buildBlogPost));
+      const builtPosts = await Promise.all(relativePaths.map(buildBlogPost));
+      const posts = builtPosts.filter((post) => post !== undefined);
 
-      return { status: "success", result: posts.filter((post) => post !== undefined) };
+      if (posts.length === 0) {
+        return { status: "error", err: new NoBlogPostsError("No blog posts metadata found.") };
+      }
+
+      return { status: "success", result: posts };
     } catch (err: unknown) {
       return { status: "error", err };
     }
