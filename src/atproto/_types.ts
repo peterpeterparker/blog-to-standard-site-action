@@ -1,0 +1,49 @@
+import { z } from "zod";
+import { BlogPostSchema } from "../common/blog.ts";
+
+export const AtProtoCreateSessionArgsSchema = z.strictObject({
+  did: z.string(),
+  pwd: z.string(),
+});
+
+export const AtProtoCreateSessionResponseSchema = z.object({
+  accessJwt: z.string(),
+});
+
+export type AtProtoCreateSessionResponse = z.infer<typeof AtProtoCreateSessionResponseSchema>;
+
+export const AtProtoCreateRecordArgsSchema = z.strictObject({
+  did: z.string(),
+  publicationRkey: z.string(),
+  ...BlogPostSchema.shape,
+});
+
+export const AtProtoCreateRecordResponseSchema = z.object({
+  uri: z.string(),
+  cid: z.string(),
+});
+
+export type AtProtoCreateRecordResponse = z.infer<typeof AtProtoCreateRecordResponseSchema>;
+
+export const AtProtoCreateSessionCodec = z.codec(AtProtoCreateSessionArgsSchema, z.string(), {
+  decode: ({ did: identifier, pwd: password }) =>
+    // https://github.com/bluesky-social/atproto/blob/main/lexicons/com/atproto/server/createSession.json
+    JSON.stringify({ identifier, password }),
+  encode: (json) => JSON.parse(json),
+});
+
+export const AtProtoCreateRecordCodec = z.codec(AtProtoCreateRecordArgsSchema, z.string(), {
+  decode: ({ did, publicationRkey, ...blogPost }) =>
+    // https://github.com/bluesky-social/atproto/blob/main/lexicons/com/atproto/repo/createRecord.json
+    JSON.stringify({
+      repo: did,
+      collection: "site.standard.document",
+      record: {
+        $type: "site.standard.document",
+        site: `at://${did}/site.standard.publication/${publicationRkey}`,
+        ...blogPost,
+        publishedAt: new Date().toISOString(),
+      },
+    }),
+  encode: (json) => JSON.parse(json),
+});

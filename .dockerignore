@@ -1,0 +1,15 @@
+# ignore all files by default
+*
+# include required files with an exception
+!entrypoint.sh
+!src/**
+!test/**
+!LICENSE
+!README.md
+!package.json
+!bun.lock
+!.oxfmtrc.json
+!.oxlintrc.json
+!tsconfig.json
+!bunfig.toml
+!test-setup.ts

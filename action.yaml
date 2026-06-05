@@ -1,0 +1,36 @@
+name: "Blog to Standard.Site"
+description: "Automatically create Standard.Site records for new blog posts."
+author: "peterpeterparker"
+
+branding:
+  icon: "globe"
+  color: "purple"
+
+inputs:
+  blog_posts_path:
+    description: "Path to match blog post files (e.g. src/routes/blog)"
+    required: true
+  github_token:
+    description: "Optional GitHub token used to fetch commit information from the GitHub API"
+  at_proto_did:
+    description: "AT Protocol Decentralized Identifier (DID)"
+    required: true
+  at_proto_app_password:
+    description: "AT Protocol app password"
+    required: true
+  at_proto_publication_rkey:
+    description: "Record key of the site.standard.publication record"
+    required: true
+
+runs:
+  using: "docker"
+  # For release
+  image: "docker://peterpeterparker/blog-to-standard-site:0.0.1"
+  # Uncomment for development purpose
+  # image: "Dockerfile"
+  env:
+    BLOG_POSTS_PATH: ${{ inputs.blog_posts_path }}
+    GITHUB_TOKEN: ${{ inputs.github_token }}
+    AT_PROTO_DID: ${{ inputs.at_proto_did }}
+    AT_PROTO_APP_PASSWORD: ${{ inputs.at_proto_app_password }}
+    AT_PROTO_PUBLICATION_RKEY: ${{ inputs.at_proto_publication_rkey }}

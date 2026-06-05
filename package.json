@@ -1,0 +1,28 @@
+{
+  "name": "blog-to-standard-site",
+  "version": "0.0.1",
+  "private": true,
+  "description": "Automatically create Standard.Site records for new blog posts.",
+  "license": "MIT",
+  "author": "David Dal Busco (https://daviddalbusco.com)",
+  "type": "module",
+  "module": "src/index.ts",
+  "scripts": {
+    "dev": "NODE_ENV=development bun run src/index.ts",
+    "build": "NODE_ENV=production bun build --compile --minify-whitespace --minify-syntax --target bun --outfile ./build/action ./src/index.ts",
+    "test": "bun test",
+    "lint": "bunx oxlint",
+    "lint:fix": "bunx oxlint --fix",
+    "fmt": "bunx oxfmt",
+    "fmt:check": "bunx oxfmt --check"
+  },
+  "dependencies": {
+    "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "@types/bun": "latest",
+    "oxfmt": "^0.48.0",
+    "oxlint": "^1.63.0",
+    "typescript": "^6.0.3"
+  }
+}
