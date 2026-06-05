@@ -107,7 +107,7 @@ export class Blog {
         }
 
         const obj: Record<string, string> = {};
-        obj[key] = rest.join(":").replace(/"/g, "").trim();
+        obj[key.trim()] = rest.join(":").replace(/"/g, "").trim();
 
         return { ...acc, ...obj };
       },
