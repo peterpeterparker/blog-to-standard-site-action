@@ -27,6 +27,8 @@ export const run = async (): Promise<Result<void>> => {
 
   const blogPostsResult = await Blog.create().build({ files });
 
+  console.log("Content:", blogPostsResult);
+
   if (blogPostsResult.status === "error") {
     return blogPostsResult;
   }
@@ -36,6 +38,8 @@ export const run = async (): Promise<Result<void>> => {
   // 2. Generate AtProto records
 
   const recordsResult = await AtProto.create().generateRecords(blog);
+
+  console.log("Records:", recordsResult);
 
   if (recordsResult.status === "error") {
     return recordsResult;
