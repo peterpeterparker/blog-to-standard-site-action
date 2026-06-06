@@ -1,6 +1,6 @@
 # blog-to-standard-site
 
-When you merge a pull request that adds a post to your blog, this GitHub Action kicks in: it reads the post's frontmatter and creates a `site.standard.document` record on the AT Protocol network via your Bluesky PDS.
+When you merge a pull request that adds a post to your blog, this GitHub Action kicks in: it reads the post's metadata, creates a `site.standard.document` record on the AT Protocol network, updates the frontmatter with the record URI, and opens a pull request with the changes.
 
 <p align="center">
   <a href="https://github.com/peterpeterparker/blog-to-standard-site"><img alt="Checks" src="https://img.shields.io/github/actions/workflow/status/peterpeterparker/blog-to-standard-site/checks.yml?label=checks&style=flat-square"></a>
@@ -15,6 +15,8 @@ PR merged on GitHub
   -> GitHub Action detects new blog post
   -> Reads title, description, and path from frontmatter
   -> Creates a site.standard.document record on the AT Protocol network
+  -> Updates the blog post frontmatter with the record AT URI
+  -> Opens a pull request with the updated frontmatter
 ```
 
 ## Requirements
@@ -83,6 +85,25 @@ description: "A short description of my post."
 ---
 ```
 
+## Outcome
+
+Once the AT Protocol records have successfully been created, the related blog posts' frontmatter will be updated with their corresponding `standard_site` field:
+
+```markdown
+---
+path: "/blog/my-post"
+title: "My Post"
+description: "A short description of my post."
+standard_site: "at://did:plc:xxx/site.standard.document/xxxxxxxxxxxxxxx"
+---
+```
+
+You'll get those changes through a pull request. Once you merge it, use the `standard_site` value to render a `<link>` tag in the `<head>` of the post page:
+
+```html
+<link rel="site.standard.document" href="at://did:plc:xxx/site.standard.document/xxxxxxxxxxxxxxx" />
+```
+
 ## Usage
 
 Add the following workflow to your repository at `.github/workflows/standard-site.yml`:
@@ -114,13 +135,13 @@ jobs:
 
 ## Inputs
 
-| Input                       | Required | Description                                                                                                          |
-| --------------------------- | -------- | -------------------------------------------------------------------------------------------------------------------- |
-| `blog_posts_path`           | yes      | Path to your blog posts directory (e.g. `src/blog`)                                                                  |
-| `github_token`              | no       | Optional GitHub token for fetching commit info from the GitHub API. Useful for private repos or to avoid rate limits |
-| `at_proto_app_password`     | yes      | Your Bluesky app password                                                                                            |
-| `at_proto_did`              | yes      | Your AT Protocol Decentralized Identifier (DID)                                                                      |
-| `at_proto_publication_rkey` | yes      | Record key of your `site.standard.publication` record                                                                |
+| Input                       | Required | Description                                                                                     |
+| --------------------------- | -------- | ----------------------------------------------------------------------------------------------- |
+| `blog_posts_path`           | yes      | Path to your blog posts directory (e.g. `src/blog`)                                             |
+| `github_token`              | yes      | GitHub token used to fetch the blog posts and create a pull request with the Standard.Site URIs |
+| `at_proto_did`              | yes      | Your AT Protocol Decentralized Identifier (DID)                                                 |
+| `at_proto_app_password`     | yes      | Your Bluesky app password                                                                       |
+| `at_proto_publication_rkey` | yes      | Record key of your `site.standard.publication` record                                           |
 
 ## Secrets
 
