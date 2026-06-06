@@ -81,10 +81,11 @@ describe("Blog", () => {
       }
 
       expect(result.result.posts).toHaveLength(1);
-      expect(result.result.posts[0]?.path).toBe("/blog/hello-world");
-      expect(result.result.posts[0]?.title).toBe("Hello World");
-      expect(result.result.posts[0]?.description).toBe("A hello world post");
-      expect(result.result.posts[0]?.publishedAt).toBeDefined();
+      expect(result.result.posts[0]?.relativePath).toBe("__fixtures__/blog/hello-world.md");
+      expect(result.result.posts[0]?.frontmatter.path).toBe("/blog/hello-world");
+      expect(result.result.posts[0]?.frontmatter.title).toBe("Hello World");
+      expect(result.result.posts[0]?.frontmatter.description).toBe("A hello world post");
+      expect(result.result.posts[0]?.frontmatter.publishedAt).toBeDefined();
     });
 
     it("should return error if blog post has no valid frontmatter", async () => {
@@ -149,7 +150,7 @@ describe("Blog", () => {
         return;
       }
 
-      const publishedAt = result.result.posts[0]?.publishedAt ?? "";
+      const publishedAt = result.result.posts[0]?.frontmatter.publishedAt ?? "";
       expect(publishedAt >= before).toBe(true);
       expect(publishedAt <= after).toBe(true);
     });
@@ -169,6 +170,62 @@ describe("Blog", () => {
       }
 
       expect(result.err).toBeInstanceOf(NoBlogPostsError);
+    });
+  });
+
+  describe("update", () => {
+    it("should add standard_site to frontmatter", async () => {
+      const filePath = join(TEST_DIR, "update-test.md");
+      await writeFile(filePath, frontmatter("/blog/update-test", "Update Test", "A test post"));
+
+      const result = await Blog.create().update({
+        posts: [
+          {
+            relativePath: "__fixtures__/blog/update-test.md",
+            frontmatter: {
+              path: "/blog/update-test",
+              title: "Update Test",
+              description: "A test post",
+              publishedAt: "2026-06-05T00:00:00.000Z",
+              standardSite: "at://did:plc:xxx/site.standard.document/abc123",
+            },
+          },
+        ],
+      });
+
+      expect(result.status).toBe("success");
+
+      const content = await Bun.file(filePath).text();
+      expect(content).toContain('standard_site: "at://did:plc:xxx/site.standard.document/abc123"');
+    });
+
+    it("should update existing standard_site in frontmatter", async () => {
+      const filePath = join(TEST_DIR, "update-existing.md");
+      await writeFile(
+        filePath,
+        `---\npath: "/blog/update-existing"\ntitle: "Update Existing"\ndescription: "A test post"\nstandard_site: "at://did:plc:xxx/site.standard.document/old"\n---`,
+      );
+
+      const result = await Blog.create().update({
+        posts: [
+          {
+            relativePath: "__fixtures__/blog/update-existing.md",
+            frontmatter: {
+              path: "/blog/update-existing",
+              title: "Update Existing",
+              description: "A test post",
+              publishedAt: "2026-06-05T00:00:00.000Z",
+              standardSite: "at://did:plc:xxx/site.standard.document/new",
+            },
+          },
+        ],
+      });
+
+      expect(result.status).toBe("success");
+
+      const content = await Bun.file(filePath).text();
+      expect(content).toContain('standard_site: "at://did:plc:xxx/site.standard.document/new"');
+      expect(content).not.toContain("old");
     });
   });
 });

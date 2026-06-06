@@ -8,7 +8,11 @@ import {
   type BlogPost,
   type BlogPosts,
   BlogPostSchema,
+  type BlogPostWithStandardSite,
+  type BlogWithStandardSite,
+  type Frontmatter,
 } from "../common/blog.ts";
+import { safeExec } from "../common/exec.ts";
 
 export class NoBlogPostsError extends Error {}
 
@@ -34,6 +38,10 @@ export class Blog {
         posts,
       },
     };
+  }
+
+  async update(blog: BlogWithStandardSite): Promise<Result<void>> {
+    return this.#updatePosts(blog);
   }
 
   async #collect(params: { files: RelativePath[] }): Promise<Result<BlogPosts>> {
@@ -82,7 +90,7 @@ export class Blog {
   }: {
     relativePath: RelativePath;
     repoRoot: string;
-  }): Promise<Partial<BlogPost> | undefined> {
+  }): Promise<Pick<BlogPost, "relativePath"> & { frontmatter: Partial<Frontmatter> | undefined }> {
     const file = Bun.file(join(repoRoot, relativePath));
     const content = await file.text();
 
@@ -94,8 +102,8 @@ export class Blog {
       ?.split("\n")
       ?.filter((value: string) => value !== "");
 
-    return rawMetadata?.reduce<Partial<BlogPost>>(
-      (acc: Partial<BlogPost>, value: string) => {
+    const frontmatter = rawMetadata?.reduce<Partial<Frontmatter>>(
+      (acc: Partial<Frontmatter>, value: string) => {
         const [key, ...rest] = value.trim().split(":");
 
         if (!notEmptyString(key)) {
@@ -111,6 +119,11 @@ export class Blog {
         publishedAt: new Date().toISOString(),
       },
     );
+
+    return {
+      relativePath,
+      frontmatter,
+    };
   }
 
   async #findLatestBlogPosts({
@@ -133,5 +146,43 @@ export class Blog {
     );
 
     return { status: "success", result: { relativePaths: mdFiles } };
+  }
+
+  async #updatePosts({ posts }: BlogWithStandardSite): Promise<Result<void>> {
+    const update = async (post: BlogPostWithStandardSite) => {
+      return await this.#updateFrontmatter(post);
+    };
+
+    const updatePosts = async (): Promise<Result<void>> => {
+      try {
+        await Promise.all(posts.map(update));
+
+        return { status: "success", result: undefined };
+      } catch (err: unknown) {
+        return { status: "error", err };
+      }
+    };
+
+    return await safeExec(updatePosts);
+  }
+
+  async #updateFrontmatter({
+    relativePath,
+    frontmatter: { standardSite },
+  }: BlogPostWithStandardSite) {
+    const repoRoot = envRepoRoot();
+    const filePath = join(repoRoot, relativePath);
+
+    const file = Bun.file(filePath);
+    const content = await file.text();
+
+    const updateRegex = /standard_site:.*/;
+    const insertRegex = /^(---[\s\S]*?)(---)$/m;
+
+    const updated = content.match(/standard_site:/)
+      ? content.replace(updateRegex, `standard_site: "${standardSite}"`)
+      : content.replace(insertRegex, `$1standard_site: "${standardSite}"\n$2`);
+
+    await Bun.write(filePath, updated);
   }
 }

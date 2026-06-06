@@ -1,5 +1,5 @@
 import type { Result } from "../common/types.ts";
-import { NotEmptyStringSchema } from "../common/asserts.ts";
+import { assertNotEmptyString, NotEmptyStringSchema } from "../common/asserts.ts";
 import { z } from "zod";
 import { GitProvider } from "./_git.ts";
 import type { RelativePath } from "../common/files.ts";
@@ -17,34 +17,45 @@ const GitHubCommitSchema = z.object({
 
 @GitProvider
 export class GitHub {
+  #repository: string;
+  #token: string;
+
+  constructor({ repository, token }: { repository: string; token: string }) {
+    this.#repository = repository;
+    this.#token = token;
+  }
+
   static create(): GitHub {
-    return new this();
+    const { GITHUB_REPOSITORY, GITHUB_TOKEN } = process.env;
+
+    assertNotEmptyString(GITHUB_REPOSITORY, "GITHUB_REPOSITORY");
+    assertNotEmptyString(GITHUB_TOKEN, "GITHUB_TOKEN");
+
+    return new this({
+      repository: GITHUB_REPOSITORY,
+      token: GITHUB_TOKEN,
+    });
   }
 
   async findAddedFiles(): Promise<Result<{ files: RelativePath[] }>> {
-    const { GITHUB_SHA, GITHUB_REPOSITORY, GITHUB_TOKEN } = process.env;
+    const { GITHUB_SHA } = process.env;
 
     const shaParsed = NotEmptyStringSchema.safeParse(GITHUB_SHA);
     if (!shaParsed.success) {
       return { status: "error", err: shaParsed.error };
     }
 
-    const repoParsed = NotEmptyStringSchema.safeParse(GITHUB_REPOSITORY);
-    if (!repoParsed.success) {
-      return { status: "error", err: repoParsed.error };
-    }
-
-    const tokenParsed = NotEmptyStringSchema.safeParse(GITHUB_TOKEN);
-
     const { data: sha } = shaParsed;
-    const { data: repository } = repoParsed;
 
-    const response = await fetch(`https://api.github.com/repos/${repository}/commits/${sha}`, {
-      headers: {
-        ...(tokenParsed.success && { Authorization: `Bearer ${tokenParsed.data}` }),
-        Accept: "application/vnd.github.v3+json",
+    const response = await fetch(
+      `https://api.github.com/repos/${this.#repository}/commits/${sha}`,
+      {
+        headers: {
+          Authorization: `Bearer ${this.#token}`,
+          Accept: "application/vnd.github.v3+json",
+        },
       },
-    });
+    );
 
     if (!response.ok) {
       return {

@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { BlogPostSchema } from "../common/blog.ts";
+import { FrontmatterSchema } from "../common/blog.ts";
 
 export const AtProtoCreateSessionArgsSchema = z.strictObject({
   did: z.string(),
@@ -15,7 +15,7 @@ export type AtProtoCreateSessionResponse = z.infer<typeof AtProtoCreateSessionRe
 export const AtProtoCreateRecordArgsSchema = z.strictObject({
   did: z.string(),
   publicationRkey: z.string(),
-  ...BlogPostSchema.shape,
+  ...FrontmatterSchema.shape,
 });
 
 export const AtProtoCreateRecordResponseSchema = z.object({

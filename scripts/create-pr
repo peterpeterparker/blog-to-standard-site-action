@@ -1,0 +1,19 @@
+#!/bin/bash
+
+set -e
+
+cd $GITHUB_WORKSPACE
+
+git config --global user.email "github-actions[bot]@users.noreply.github.com"
+git config --global user.name "github-actions[bot]"
+
+git checkout -b chore/blog-to-standard-site
+git add .
+git commit -m "chore: add Standard.Site URIs to blog posts"
+git push origin chore/blog-to-standard-site
+
+gh pr create \
+  --title "chore: add Standard.Site URIs to blog posts" \
+  --body "Automated PR to add \`standard_site\` frontmatter field to new blog posts." \
+  --base $GITHUB_REF_NAME \
+  --head chore/blog-to-standard-site
