@@ -26,7 +26,7 @@ inputs:
 runs:
   using: "docker"
   # For release
-  image: "docker://peterpeterparker/blog-to-standard-site-action:0.0.1"
+  image: "docker://peterpeterparker/blog-to-standard-site-action:0.0.3"
   # Uncomment for development purpose
   # image: "Dockerfile"
   env:
