@@ -80,7 +80,7 @@ export class Blog {
 
       const [postsToSubmit, postsWithStandardSite] = posts.reduce<[BlogPosts, BlogPosts]>(
         ([toSubmit, withSite], post) =>
-          notEmptyString(post.frontmatter.standardSite)
+          notEmptyString(post.frontmatter.standard_site)
             ? [toSubmit, [...withSite, post]]
             : [[...toSubmit, post], withSite],
         [[], []],
