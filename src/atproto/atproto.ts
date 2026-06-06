@@ -1,6 +1,6 @@
 import { assertNotEmptyString } from "../common/asserts.ts";
 import type { Result } from "../common/types.ts";
-import type { Blog, BlogPost } from "../common/blog.ts";
+import type { Blog, BlogPost, BlogWithStandardSite } from "../common/blog.ts";
 import {
   AtProtoCreateRecordCodec,
   type AtProtoCreateRecordResponse,
@@ -16,6 +16,8 @@ export class AtProtoApiCreateSessionError extends AtProtoApiError {}
 export class AtProtoApiCreateRecordError extends AtProtoApiError {}
 
 export class AtProtoCreateRecordsWithError extends Error {}
+
+type BlogPostRecordTuple = [BlogPost, AtProtoCreateRecordResponse];
 
 export class AtProto {
   #did: string; // Decentralized Identifier
@@ -42,7 +44,7 @@ export class AtProto {
     });
   }
 
-  async generateRecords({ posts }: Blog): Promise<Result<void>> {
+  async generateRecords({ posts }: Blog): Promise<Result<BlogWithStandardSite>> {
     const createSession = async () => {
       return await this.#createSession();
     };
@@ -55,9 +57,17 @@ export class AtProto {
 
     const { result: session } = sessionResult;
 
-    const createRecord = async (post: BlogPost): Promise<Result<AtProtoCreateRecordResponse>> => {
-      const fn = async () => {
-        return await this.#createRecord({ ...session, post });
+    const createRecord = async (post: BlogPost): Promise<Result<BlogPostRecordTuple>> => {
+      const fn = async (): Promise<Result<BlogPostRecordTuple>> => {
+        const result = await this.#createRecord({ ...session, post });
+
+        if (result.status === "error") {
+          return result;
+        }
+
+        const { result: record } = result;
+
+        return { status: "success", result: [post, record] };
       };
 
       return await safeExec(fn);
@@ -65,7 +75,7 @@ export class AtProto {
 
     const results = await Promise.all(posts.map(createRecord));
 
-    this.#printSummary(results);
+    this.#printErrors(results);
 
     const withErrors = results.find(({ status }) => status === "error");
 
@@ -78,7 +88,22 @@ export class AtProto {
       };
     }
 
-    return { status: "success", result: undefined };
+    const postsWithStandardSite = results
+      .filter(
+        (result): result is Result<BlogPostRecordTuple> & { status: "success" } =>
+          result.status === "success",
+      )
+      .map(({ result }) => {
+        const [post, record] = result;
+        const { uri: standardSite } = record;
+
+        return {
+          ...post,
+          standardSite,
+        };
+      });
+
+    return { status: "success", result: { posts: postsWithStandardSite } };
   }
 
   async #createSession(): Promise<Result<AtProtoCreateSessionResponse>> {
@@ -150,13 +175,11 @@ export class AtProto {
     return { status: "success", result };
   }
 
-  #printSummary(results: Result<AtProtoCreateRecordResponse>[]) {
-    for (const result of results) {
-      if (result.status === "error") {
-        console.error(`Failed to create record: ${result.err}`);
-      } else {
-        console.log(`Record created: ${result.result.uri}`);
-      }
-    }
+  #printErrors(results: Result<BlogPostRecordTuple>[]) {
+    const errors = results.filter(
+      (result): result is Result<AtProtoCreateRecordResponse> & { status: "error" } =>
+        result.status === "error",
+    );
+    errors.forEach(({ err }) => console.error(`Failed to create record: ${err}`));
   }
 }

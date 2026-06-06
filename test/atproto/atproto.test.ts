@@ -118,6 +118,11 @@ describe("AtProto", () => {
       const result = await AtProto.create().generateRecords({ posts: [] });
 
       expect(result.status).toBe("success");
+      if (result.status !== "success") {
+        expect(true).toBeFalsy();
+        return;
+      }
+      expect(result.result.posts).toHaveLength(0);
     });
 
     it("should call createSession with correct credentials", async () => {
@@ -158,6 +163,25 @@ describe("AtProto", () => {
         "at://did:plc:fxmgj7lnas3ewnc3hmpx2vg6/site.standard.publication/3mnjy5srkem2h",
       );
       expect(body.record.publishedAt).toBe("2026-06-05T00:00:00.000Z");
+    });
+
+    it("should return success if all records are created", async () => {
+      spyOn(globalThis, "fetch")
+        .mockResolvedValueOnce(new Response(JSON.stringify(mockSessionResponse), { status: 200 }))
+        .mockResolvedValueOnce(new Response(JSON.stringify(mockRecordResponse), { status: 200 }))
+        .mockResolvedValueOnce(new Response(JSON.stringify(mockRecordResponse), { status: 200 }));
+
+      const result = await AtProto.create().generateRecords(mockBlog);
+
+      expect(result.status).toBe("success");
+      if (result.status !== "success") {
+        expect(true).toBeFalsy();
+        return;
+      }
+      expect(result.result.posts).toHaveLength(2);
+      expect(result.result.posts[0]?.standardSite).toBe(
+        "at://did:plc:fxmgj7lnas3ewnc3hmpx2vg6/site.standard.document/abc123",
+      );
     });
   });
 });
