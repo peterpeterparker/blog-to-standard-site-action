@@ -28,7 +28,6 @@ COPY tsconfig.json tsconfig.json
 COPY package.json package.json
 COPY bunfig.toml bunfig.toml
 COPY test-setup.ts test-setup.ts
-COPY scripts scripts
 
 # tests & build
 ENV NODE_ENV=production
@@ -52,8 +51,5 @@ RUN chmod +x /usr/src/scripts/create-pr
 
 COPY "entrypoint.sh" "/entrypoint.sh"
 RUN chmod +x /entrypoint.sh
-
-# User to run the app
-USER bun
 
 ENTRYPOINT ["/entrypoint.sh"]
