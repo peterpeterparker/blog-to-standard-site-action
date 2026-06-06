@@ -29,7 +29,7 @@ describe("Action", () => {
           title: "Hello World",
           description: "A post",
           publishedAt: "2026-06-05T00:00:00.000Z",
-          standardSite: "at://did:plc:fxmgj7lnas3ewnc3hmpx2vg6/site.standard.document/abc123",
+          standard_site: "at://did:plc:fxmgj7lnas3ewnc3hmpx2vg6/site.standard.document/abc123",
         },
       },
     ],

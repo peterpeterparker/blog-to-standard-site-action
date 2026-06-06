@@ -96,13 +96,13 @@ export class AtProto {
       .map(({ result }) => {
         const [post, record] = result;
         const { relativePath, frontmatter } = post;
-        const { uri: standardSite } = record;
+        const { uri: standard_site } = record;
 
         return {
           relativePath,
           frontmatter: {
             ...frontmatter,
-            standardSite,
+            standard_site,
           },
         };
       });

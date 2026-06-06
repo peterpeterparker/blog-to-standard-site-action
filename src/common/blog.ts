@@ -7,11 +7,11 @@ export const FrontmatterSchema = z.object({
   title: NotEmptyStringSchema,
   description: NotEmptyStringSchema,
   publishedAt: z.iso.datetime(),
-  standardSite: NotEmptyStringSchema.optional(),
+  standard_site: NotEmptyStringSchema.optional(),
 });
 
 export const FrontmatterWithStandardSiteSchema = FrontmatterSchema.required({
-  standardSite: true,
+  standard_site: true,
 });
 
 export const BlogPostSchema = z.strictObject({
