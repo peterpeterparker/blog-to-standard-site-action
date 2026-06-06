@@ -46,6 +46,9 @@ COPY --from=prerelease /usr/src/app/build/action .
 
 COPY LICENSE README.md /
 
+COPY scripts /usr/src/scripts
+RUN chmod +x /usr/src/scripts/create-pr
+
 COPY "entrypoint.sh" "/entrypoint.sh"
 RUN chmod +x /entrypoint.sh
 
