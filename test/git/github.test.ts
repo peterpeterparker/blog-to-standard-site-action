@@ -1,4 +1,4 @@
-import { describe, expect, it, afterEach, beforeEach, spyOn } from "bun:test";
+import { describe, expect, it, afterEach, beforeEach, spyOn, mock } from "bun:test";
 import { GitHub, GitHubApiError } from "../../src/git/github.ts";
 import { ZodError } from "zod";
 
@@ -6,20 +6,45 @@ describe("GitHub", () => {
   let gitHub: GitHub;
 
   beforeEach(() => {
+    process.env.GITHUB_SHA = "abc123";
+    process.env.GITHUB_REPOSITORY = "peterpeterparker/my-blog";
+    process.env.GITHUB_TOKEN = "token123";
+    process.env.GITHUB_REF_NAME = "main";
+
     gitHub = GitHub.create();
   });
 
-  describe("findAddedFiles", () => {
-    beforeEach(() => {
-      process.env.GITHUB_SHA = "abc123";
-      process.env.GITHUB_REPOSITORY = "peterpeterparker/my-blog";
-    });
+  afterEach(() => {
+    delete process.env.GITHUB_SHA;
+    delete process.env.GITHUB_REPOSITORY;
+    delete process.env.GITHUB_TOKEN;
+    delete process.env.GITHUB_REF_NAME;
 
-    afterEach(() => {
-      delete process.env.GITHUB_SHA;
+    mock.restore();
+  });
+
+  describe("create", () => {
+    it("should throw if GITHUB_REPOSITORY is not set", () => {
       delete process.env.GITHUB_REPOSITORY;
+      expect(() => GitHub.create()).toThrow();
     });
 
+    it("should throw if GITHUB_TOKEN is not set", () => {
+      delete process.env.GITHUB_TOKEN;
+      expect(() => GitHub.create()).toThrow();
+    });
+
+    it("should throw if GITHUB_REF_NAME is not set", () => {
+      delete process.env.GITHUB_REF_NAME;
+      expect(() => GitHub.create()).toThrow();
+    });
+
+    it("should create instance with valid env vars", () => {
+      expect(() => GitHub.create()).not.toThrow();
+    });
+  });
+
+  describe("findAddedFiles", () => {
     it("should return error if GITHUB_SHA is not set", async () => {
       delete process.env.GITHUB_SHA;
 
@@ -50,24 +75,7 @@ describe("GitHub", () => {
       expect(result.err).toBeInstanceOf(ZodError);
     });
 
-    it("should return error if GITHUB_REPOSITORY is not set", async () => {
-      delete process.env.GITHUB_REPOSITORY;
-
-      const result = await gitHub.findAddedFiles();
-
-      expect(result.status).toBe("error");
-
-      if (result.status !== "error") {
-        expect(true).toBeFalsy();
-        return;
-      }
-
-      expect(result.err).toBeInstanceOf(ZodError);
-    });
-
-    it("should call GitHub API with Authorization header if GITHUB_TOKEN is set", async () => {
-      process.env.GITHUB_TOKEN = "token123";
-
+    it("should call GitHub API with Authorization header", async () => {
       const fetchSpy = spyOn(globalThis, "fetch").mockResolvedValueOnce(
         new Response(JSON.stringify({ files: [] }), { status: 200 }),
       );
@@ -82,8 +90,6 @@ describe("GitHub", () => {
           }),
         }),
       );
-
-      delete process.env.GITHUB_TOKEN;
     });
 
     it("should return error if GitHub API fails", async () => {

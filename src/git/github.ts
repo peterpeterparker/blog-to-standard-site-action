@@ -1,5 +1,5 @@
 import type { Result } from "../common/types.ts";
-import { NotEmptyStringSchema } from "../common/asserts.ts";
+import { assertNotEmptyString, NotEmptyStringSchema } from "../common/asserts.ts";
 import { z } from "zod";
 import { GitProvider } from "./_git.ts";
 import type { RelativePath } from "../common/files.ts";
@@ -17,34 +17,57 @@ const GitHubCommitSchema = z.object({
 
 @GitProvider
 export class GitHub {
+  #repository: string;
+  #token: string;
+  #refName: string;
+
+  constructor({
+    repository,
+    token,
+    refName,
+  }: {
+    repository: string;
+    token: string;
+    refName: string;
+  }) {
+    this.#repository = repository;
+    this.#token = token;
+    this.#refName = refName;
+  }
+
   static create(): GitHub {
-    return new this();
+    const { GITHUB_REPOSITORY, GITHUB_TOKEN, GITHUB_REF_NAME } = process.env;
+
+    assertNotEmptyString(GITHUB_REPOSITORY, "GITHUB_REPOSITORY");
+    assertNotEmptyString(GITHUB_TOKEN, "GITHUB_TOKEN");
+    assertNotEmptyString(GITHUB_REF_NAME, "GITHUB_REF_NAME");
+
+    return new this({
+      repository: GITHUB_REPOSITORY,
+      token: GITHUB_TOKEN,
+      refName: GITHUB_REF_NAME,
+    });
   }
 
   async findAddedFiles(): Promise<Result<{ files: RelativePath[] }>> {
-    const { GITHUB_SHA, GITHUB_REPOSITORY, GITHUB_TOKEN } = process.env;
+    const { GITHUB_SHA } = process.env;
 
     const shaParsed = NotEmptyStringSchema.safeParse(GITHUB_SHA);
     if (!shaParsed.success) {
       return { status: "error", err: shaParsed.error };
     }
 
-    const repoParsed = NotEmptyStringSchema.safeParse(GITHUB_REPOSITORY);
-    if (!repoParsed.success) {
-      return { status: "error", err: repoParsed.error };
-    }
-
-    const tokenParsed = NotEmptyStringSchema.safeParse(GITHUB_TOKEN);
-
     const { data: sha } = shaParsed;
-    const { data: repository } = repoParsed;
 
-    const response = await fetch(`https://api.github.com/repos/${repository}/commits/${sha}`, {
-      headers: {
-        ...(tokenParsed.success && { Authorization: `Bearer ${tokenParsed.data}` }),
-        Accept: "application/vnd.github.v3+json",
+    const response = await fetch(
+      `https://api.github.com/repos/${this.#repository}/commits/${sha}`,
+      {
+        headers: {
+          Authorization: `Bearer ${this.#token}`,
+          Accept: "application/vnd.github.v3+json",
+        },
       },
-    });
+    );
 
     if (!response.ok) {
       return {
