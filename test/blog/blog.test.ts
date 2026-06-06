@@ -81,10 +81,11 @@ describe("Blog", () => {
       }
 
       expect(result.result.posts).toHaveLength(1);
-      expect(result.result.posts[0]?.path).toBe("/blog/hello-world");
-      expect(result.result.posts[0]?.title).toBe("Hello World");
-      expect(result.result.posts[0]?.description).toBe("A hello world post");
-      expect(result.result.posts[0]?.publishedAt).toBeDefined();
+      expect(result.result.posts[0]?.relativePath).toBe("__fixtures__/blog/hello-world.md");
+      expect(result.result.posts[0]?.frontmatter.path).toBe("/blog/hello-world");
+      expect(result.result.posts[0]?.frontmatter.title).toBe("Hello World");
+      expect(result.result.posts[0]?.frontmatter.description).toBe("A hello world post");
+      expect(result.result.posts[0]?.frontmatter.publishedAt).toBeDefined();
     });
 
     it("should return error if blog post has no valid frontmatter", async () => {
@@ -149,7 +150,7 @@ describe("Blog", () => {
         return;
       }
 
-      const publishedAt = result.result.posts[0]?.publishedAt ?? "";
+      const publishedAt = result.result.posts[0]?.frontmatter.publishedAt ?? "";
       expect(publishedAt >= before).toBe(true);
       expect(publishedAt <= after).toBe(true);
     });
