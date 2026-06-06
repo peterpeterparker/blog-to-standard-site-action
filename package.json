@@ -1,5 +1,5 @@
 {
-  "name": "blog-to-standard-site",
+  "name": "blog-to-standard-site-action",
   "version": "0.0.1",
   "private": true,
   "description": "Automatically create Standard.Site records for new blog posts.",

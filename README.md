@@ -1,11 +1,11 @@
-# blog-to-standard-site
+# blog-to-standard-site-action
 
 When you merge a pull request that adds a post to your blog, this GitHub Action kicks in: it reads the post's metadata, creates a `site.standard.document` record on the AT Protocol network, updates the frontmatter with the record URI, and opens a pull request with the changes.
 
 <p align="center">
-  <a href="https://github.com/peterpeterparker/blog-to-standard-site"><img alt="Checks" src="https://img.shields.io/github/actions/workflow/status/peterpeterparker/blog-to-standard-site/checks.yml?label=checks&style=flat-square"></a>
-  <a href="https://github.com/peterpeterparker/blog-to-standard-site"><img alt="Tests" src="https://img.shields.io/github/actions/workflow/status/peterpeterparker/blog-to-standard-site/tests.yml?label=tests&style=flat-square"></a>
-  <a href="https://github.com/peterpeterparker/blog-to-standard-site/releases"><img alt="GitHub Release" src="https://img.shields.io/github/v/release/peterpeterparker/blog-to-standard-site?style=flat-square"></a>
+  <a href="https://github.com/peterpeterparker/blog-to-standard-site-action"><img alt="Checks" src="https://img.shields.io/github/actions/workflow/status/peterpeterparker/blog-to-standard-site-action/checks.yml?label=checks&style=flat-square"></a>
+  <a href="https://github.com/peterpeterparker/blog-to-standard-site-action"><img alt="Tests" src="https://img.shields.io/github/actions/workflow/status/peterpeterparker/blog-to-standard-site-action/tests.yml?label=tests&style=flat-square"></a>
+  <a href="https://github.com/peterpeterparker/blog-to-standard-site-action/releases"><img alt="GitHub Release" src="https://img.shields.io/github/v/release/peterpeterparker/blog-to-standard-site-action?style=flat-square"></a>
 </p>
 
 ## How it works
@@ -124,7 +124,7 @@ jobs:
         with:
           persist-credentials: false
 
-      - uses: peterpeterparker/blog-to-standard-site@b7fbda65e723c932902b9e5c1d69ad1d24b5fb34 # v0.0.1
+      - uses: peterpeterparker/blog-to-standard-site-action@b7fbda65e723c932902b9e5c1d69ad1d24b5fb34 # v0.0.1
         with:
           blog_posts_path: "src/blog"
           github_token: ${{ secrets.GITHUB_TOKEN }}
