@@ -124,7 +124,7 @@ jobs:
         with:
           persist-credentials: false
 
-      - uses: peterpeterparker/blog-to-standard-site-action@aa819ec7849657d0b92235cba64bad05035f287b # v0.0.2
+      - uses: peterpeterparker/blog-to-standard-site-action@9599ed64a9b1dd3cd3eac2c64d2eca7936edff4c # v0.0.3
         with:
           blog_posts_path: "src/blog"
           github_token: ${{ secrets.GITHUB_TOKEN }}
