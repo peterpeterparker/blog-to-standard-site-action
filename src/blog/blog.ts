@@ -78,7 +78,30 @@ export class Blog {
         return { status: "error", err: new NoBlogPostsError("No blog posts metadata found.") };
       }
 
-      return { status: "success", result: posts };
+      const [postsToSubmit, postsWithStandardSite] = posts.reduce<[BlogPosts, BlogPosts]>(
+        ([toSubmit, withSite], post) =>
+          notEmptyString(post.frontmatter.standard_site)
+            ? [toSubmit, [...withSite, post]]
+            : [[...toSubmit, post], withSite],
+        [[], []],
+      );
+
+      // We do not want to create records for those who already have AT Protocol records.
+      // For simplicity reasons, we assume that if a URI exists in the frontmatter, it effectively exists.
+      postsWithStandardSite.forEach(({ relativePath }) =>
+        console.info(`Skipping ${relativePath}: standard_site already set.`),
+      );
+
+      if (postsToSubmit.length === 0) {
+        return {
+          status: "error",
+          err: new NoBlogPostsError(
+            "No blog posts without an existing Standard.Site record found.",
+          ),
+        };
+      }
+
+      return { status: "success", result: postsToSubmit };
     } catch (err: unknown) {
       return { status: "error", err };
     }
@@ -168,7 +191,7 @@ export class Blog {
 
   async #updateFrontmatter({
     relativePath,
-    frontmatter: { standardSite },
+    frontmatter: { standard_site },
   }: BlogPostWithStandardSite) {
     const repoRoot = envRepoRoot();
     const filePath = join(repoRoot, relativePath);
@@ -180,8 +203,8 @@ export class Blog {
     const insertRegex = /^(---[\s\S]*?)(---)$/m;
 
     const updated = content.match(/standard_site:/)
-      ? content.replace(updateRegex, `standard_site: "${standardSite}"`)
-      : content.replace(insertRegex, `$1standard_site: "${standardSite}"\n$2`);
+      ? content.replace(updateRegex, `standard_site: "${standard_site}"`)
+      : content.replace(insertRegex, `$1standard_site: "${standard_site}"\n$2`);
 
     await Bun.write(filePath, updated);
   }
