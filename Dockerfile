@@ -52,7 +52,4 @@ RUN chmod +x /usr/src/scripts/create-pr
 COPY "entrypoint.sh" "/entrypoint.sh"
 RUN chmod +x /entrypoint.sh
 
-# User to run the app
-USER bun
-
 ENTRYPOINT ["/entrypoint.sh"]
