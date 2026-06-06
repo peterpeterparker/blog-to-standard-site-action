@@ -39,6 +39,8 @@ FROM base AS release
 
 RUN DEBIAN_FRONTEND=noninteractive apt update && apt install -y \
     openssl \
+    git \
+    gh \
     && rm -rf /var/lib/apt/lists/*
 
 COPY --from=install /temp/prod/node_modules node_modules
