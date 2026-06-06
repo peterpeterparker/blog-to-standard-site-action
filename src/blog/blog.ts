@@ -8,6 +8,7 @@ import {
   type BlogPost,
   type BlogPosts,
   BlogPostSchema,
+  type Frontmatter,
 } from "../common/blog.ts";
 
 export class NoBlogPostsError extends Error {}
@@ -82,7 +83,7 @@ export class Blog {
   }: {
     relativePath: RelativePath;
     repoRoot: string;
-  }): Promise<Partial<BlogPost> | undefined> {
+  }): Promise<Pick<BlogPost, "relativePath"> & { frontmatter: Partial<Frontmatter> | undefined }> {
     const file = Bun.file(join(repoRoot, relativePath));
     const content = await file.text();
 
@@ -94,8 +95,8 @@ export class Blog {
       ?.split("\n")
       ?.filter((value: string) => value !== "");
 
-    return rawMetadata?.reduce<Partial<BlogPost>>(
-      (acc: Partial<BlogPost>, value: string) => {
+    const frontmatter = rawMetadata?.reduce<Partial<Frontmatter>>(
+      (acc: Partial<Frontmatter>, value: string) => {
         const [key, ...rest] = value.trim().split(":");
 
         if (!notEmptyString(key)) {
@@ -111,6 +112,11 @@ export class Blog {
         publishedAt: new Date().toISOString(),
       },
     );
+
+    return {
+      relativePath,
+      frontmatter,
+    };
   }
 
   async #findLatestBlogPosts({

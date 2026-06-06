@@ -95,11 +95,15 @@ export class AtProto {
       )
       .map(({ result }) => {
         const [post, record] = result;
+        const { relativePath, frontmatter } = post;
         const { uri: standardSite } = record;
 
         return {
-          ...post,
-          standardSite,
+          relativePath,
+          frontmatter: {
+            ...frontmatter,
+            standardSite,
+          },
         };
       });
 
@@ -138,7 +142,7 @@ export class AtProto {
 
   async #createRecord({
     accessJwt,
-    post,
+    post: { frontmatter },
   }: { post: BlogPost } & AtProtoCreateSessionResponse): Promise<
     Result<AtProtoCreateRecordResponse>
   > {
@@ -151,7 +155,7 @@ export class AtProto {
       body: AtProtoCreateRecordCodec.decode({
         did: this.#did,
         publicationRkey: this.#rkey,
-        ...post,
+        ...frontmatter,
       }),
     });
 

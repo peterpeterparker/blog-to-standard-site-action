@@ -1,7 +1,8 @@
 import { z } from "zod";
 import { NotEmptyStringSchema } from "./asserts.ts";
+import { RelativePathSchema } from "./files.ts";
 
-export const BlogPostSchema = z.object({
+export const FrontmatterSchema = z.object({
   path: NotEmptyStringSchema,
   title: NotEmptyStringSchema,
   description: NotEmptyStringSchema,
@@ -9,13 +10,24 @@ export const BlogPostSchema = z.object({
   standardSite: NotEmptyStringSchema.optional(),
 });
 
-export const BlogPostWithStandardSiteSchema = BlogPostSchema.required({
+export const FrontmatterWithStandardSiteSchema = FrontmatterSchema.required({
   standardSite: true,
+});
+
+export const BlogPostSchema = z.strictObject({
+  relativePath: RelativePathSchema,
+  frontmatter: FrontmatterSchema,
+});
+
+export const BlogPostWithStandardSiteSchema = BlogPostSchema.extend({
+  frontmatter: FrontmatterWithStandardSiteSchema,
 });
 
 export const BlogPostsSchema = z.array(BlogPostSchema);
 export const BlogPostsWithStandardSiteSchema = z.array(BlogPostWithStandardSiteSchema);
 
+export type Frontmatter = z.infer<typeof FrontmatterSchema>;
+export type FrontmatterWithStandardSite = z.infer<typeof FrontmatterWithStandardSiteSchema>;
 export type BlogPost = z.infer<typeof BlogPostSchema>;
 export type BlogPosts = z.infer<typeof BlogPostsSchema>;
 export type BlogPostWithStandardSite = z.infer<typeof BlogPostWithStandardSiteSchema>;

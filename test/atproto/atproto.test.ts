@@ -10,16 +10,22 @@ describe("AtProto", () => {
   const mockBlog: Blog = {
     posts: [
       {
-        path: "/blog/post-one",
-        title: "Post One",
-        description: "First post",
-        publishedAt: "2026-06-05T00:00:00.000Z",
+        relativePath: "src/blog/post-one.md",
+        frontmatter: {
+          path: "/blog/post-one",
+          title: "Post One",
+          description: "First post",
+          publishedAt: "2026-06-05T00:00:00.000Z",
+        },
       },
       {
-        path: "/blog/post-two",
-        title: "Post Two",
-        description: "Second post",
-        publishedAt: "2026-06-05T00:00:00.000Z",
+        relativePath: "src/blog/post-two.md",
+        frontmatter: {
+          path: "/blog/post-two",
+          title: "Post Two",
+          description: "Second post",
+          publishedAt: "2026-06-05T00:00:00.000Z",
+        },
       },
     ],
   };
@@ -179,7 +185,7 @@ describe("AtProto", () => {
         return;
       }
       expect(result.result.posts).toHaveLength(2);
-      expect(result.result.posts[0]?.standardSite).toBe(
+      expect(result.result.posts[0]?.frontmatter.standardSite).toBe(
         "at://did:plc:fxmgj7lnas3ewnc3hmpx2vg6/site.standard.document/abc123",
       );
     });
