@@ -185,7 +185,7 @@ describe("AtProto", () => {
         return;
       }
       expect(result.result.posts).toHaveLength(2);
-      expect(result.result.posts[0]?.frontmatter.standardSite).toBe(
+      expect(result.result.posts[0]?.frontmatter.standard_site).toBe(
         "at://did:plc:fxmgj7lnas3ewnc3hmpx2vg6/site.standard.document/abc123",
       );
     });

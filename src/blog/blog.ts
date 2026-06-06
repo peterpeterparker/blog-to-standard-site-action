@@ -191,7 +191,7 @@ export class Blog {
 
   async #updateFrontmatter({
     relativePath,
-    frontmatter: { standardSite },
+    frontmatter: { standard_site },
   }: BlogPostWithStandardSite) {
     const repoRoot = envRepoRoot();
     const filePath = join(repoRoot, relativePath);
@@ -203,8 +203,8 @@ export class Blog {
     const insertRegex = /^(---[\s\S]*?)(---)$/m;
 
     const updated = content.match(/standard_site:/)
-      ? content.replace(updateRegex, `standard_site: "${standardSite}"`)
-      : content.replace(insertRegex, `$1standard_site: "${standardSite}"\n$2`);
+      ? content.replace(updateRegex, `standard_site: "${standard_site}"`)
+      : content.replace(insertRegex, `$1standard_site: "${standard_site}"\n$2`);
 
     await Bun.write(filePath, updated);
   }
