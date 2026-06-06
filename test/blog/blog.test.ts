@@ -171,6 +171,52 @@ describe("Blog", () => {
 
       expect(result.err).toBeInstanceOf(NoBlogPostsError);
     });
+
+    it("should skip posts that already have standard_site set", async () => {
+      await writeFile(
+        join(TEST_DIR, "with-standard-site.md"),
+        `---\npath: "/blog/with-standard-site"\ntitle: "With Standard Site"\ndescription: "A post"\nstandard_site: "at://did:plc:xxx/site.standard.document/abc123"\n---`,
+      );
+
+      const result = await Blog.create().build({
+        files: ["__fixtures__/blog/with-standard-site.md"],
+      });
+
+      expect(result.status).toBe("error");
+      if (result.status !== "error") {
+        expect(true).toBeFalsy();
+        return;
+      }
+      expect(result.err).toBeInstanceOf(NoBlogPostsError);
+    });
+
+    it("should only return posts without standard_site set", async () => {
+      await writeFile(
+        join(TEST_DIR, "without-standard-site.md"),
+        frontmatter("/blog/without-standard-site", "Without", "A post"),
+      );
+      await writeFile(
+        join(TEST_DIR, "with-standard-site-2.md"),
+        `---\npath: "/blog/with-standard-site-2"\ntitle: "With"\ndescription: "A post"\nstandard_site: "at://did:plc:xxx/site.standard.document/abc123"\n---`,
+      );
+
+      const result = await Blog.create().build({
+        files: [
+          "__fixtures__/blog/without-standard-site.md",
+          "__fixtures__/blog/with-standard-site-2.md",
+        ],
+      });
+
+      expect(result.status).toBe("success");
+      if (result.status !== "success") {
+        expect(true).toBeFalsy();
+        return;
+      }
+      expect(result.result.posts).toHaveLength(1);
+      expect(result.result.posts[0]?.relativePath).toBe(
+        "__fixtures__/blog/without-standard-site.md",
+      );
+    });
   });
 
   describe("update", () => {
