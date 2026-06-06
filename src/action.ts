@@ -23,21 +23,27 @@ export const run = async (): Promise<Result<void>> => {
 
   // 2. Extract metadata for the posts
 
-  const blogPostsResult = await Blog.create().build({ files });
+  const blog = await Blog.create();
+
+  const blogPostsResult = await blog.build({ files });
 
   if (blogPostsResult.status === "error") {
     return blogPostsResult;
   }
 
-  const { result: blog } = blogPostsResult;
+  const { result: blogData } = blogPostsResult;
 
   // 3. Generate AtProto records
 
-  const recordsResult = await AtProto.create().generateRecords(blog);
+  const recordsResult = await AtProto.create().generateRecords(blogData);
 
   if (recordsResult.status === "error") {
     return recordsResult;
   }
 
-  return { status: "success", result: undefined };
+  const { result: blogDataWithStandardSite } = recordsResult;
+
+  // 4. Update the blog posts frontmatter with Standard Site URI
+
+  return await blog.update(blogDataWithStandardSite);
 };

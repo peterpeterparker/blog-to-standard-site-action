@@ -172,4 +172,60 @@ describe("Blog", () => {
       expect(result.err).toBeInstanceOf(NoBlogPostsError);
     });
   });
+
+  describe("update", () => {
+    it("should add standard_site to frontmatter", async () => {
+      const filePath = join(TEST_DIR, "update-test.md");
+      await writeFile(filePath, frontmatter("/blog/update-test", "Update Test", "A test post"));
+
+      const result = await Blog.create().update({
+        posts: [
+          {
+            relativePath: "__fixtures__/blog/update-test.md",
+            frontmatter: {
+              path: "/blog/update-test",
+              title: "Update Test",
+              description: "A test post",
+              publishedAt: "2026-06-05T00:00:00.000Z",
+              standardSite: "at://did:plc:xxx/site.standard.document/abc123",
+            },
+          },
+        ],
+      });
+
+      expect(result.status).toBe("success");
+
+      const content = await Bun.file(filePath).text();
+      expect(content).toContain('standard_site: "at://did:plc:xxx/site.standard.document/abc123"');
+    });
+
+    it("should update existing standard_site in frontmatter", async () => {
+      const filePath = join(TEST_DIR, "update-existing.md");
+      await writeFile(
+        filePath,
+        `---\npath: "/blog/update-existing"\ntitle: "Update Existing"\ndescription: "A test post"\nstandard_site: "at://did:plc:xxx/site.standard.document/old"\n---`,
+      );
+
+      const result = await Blog.create().update({
+        posts: [
+          {
+            relativePath: "__fixtures__/blog/update-existing.md",
+            frontmatter: {
+              path: "/blog/update-existing",
+              title: "Update Existing",
+              description: "A test post",
+              publishedAt: "2026-06-05T00:00:00.000Z",
+              standardSite: "at://did:plc:xxx/site.standard.document/new",
+            },
+          },
+        ],
+      });
+
+      expect(result.status).toBe("success");
+
+      const content = await Bun.file(filePath).text();
+      expect(content).toContain('standard_site: "at://did:plc:xxx/site.standard.document/new"');
+      expect(content).not.toContain("old");
+    });
+  });
 });
