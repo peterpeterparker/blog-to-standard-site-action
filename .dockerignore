@@ -13,3 +13,4 @@
 !tsconfig.json
 !bunfig.toml
 !test-setup.ts
+!scripts/**
