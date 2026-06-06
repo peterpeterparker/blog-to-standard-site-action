@@ -42,7 +42,6 @@ describe("Action", () => {
       process.env.AT_PROTO_APP_PASSWORD = "test-app-password";
       process.env.AT_PROTO_PUBLICATION_RKEY = "3mnjy5srkem2h";
       process.env.GITHUB_TOKEN = "token123";
-      process.env.GITHUB_REF_NAME = "main";
       process.env.GITHUB_REPOSITORY = "peterpeterparker/my-blog";
       process.env.GITHUB_SHA = "abc123";
     });
@@ -53,7 +52,6 @@ describe("Action", () => {
       delete process.env.AT_PROTO_APP_PASSWORD;
       delete process.env.AT_PROTO_PUBLICATION_RKEY;
       delete process.env.GITHUB_TOKEN;
-      delete process.env.GITHUB_REF_NAME;
       delete process.env.GITHUB_REPOSITORY;
       delete process.env.GITHUB_SHA;
       mock.restore();
