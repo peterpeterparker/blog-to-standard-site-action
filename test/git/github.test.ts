@@ -9,7 +9,6 @@ describe("GitHub", () => {
     process.env.GITHUB_SHA = "abc123";
     process.env.GITHUB_REPOSITORY = "peterpeterparker/my-blog";
     process.env.GITHUB_TOKEN = "token123";
-    process.env.GITHUB_REF_NAME = "main";
 
     gitHub = GitHub.create();
   });
@@ -18,7 +17,6 @@ describe("GitHub", () => {
     delete process.env.GITHUB_SHA;
     delete process.env.GITHUB_REPOSITORY;
     delete process.env.GITHUB_TOKEN;
-    delete process.env.GITHUB_REF_NAME;
 
     mock.restore();
   });
@@ -31,11 +29,6 @@ describe("GitHub", () => {
 
     it("should throw if GITHUB_TOKEN is not set", () => {
       delete process.env.GITHUB_TOKEN;
-      expect(() => GitHub.create()).toThrow();
-    });
-
-    it("should throw if GITHUB_REF_NAME is not set", () => {
-      delete process.env.GITHUB_REF_NAME;
       expect(() => GitHub.create()).toThrow();
     });
 

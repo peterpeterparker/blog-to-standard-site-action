@@ -19,33 +19,21 @@ const GitHubCommitSchema = z.object({
 export class GitHub {
   #repository: string;
   #token: string;
-  #refName: string;
 
-  constructor({
-    repository,
-    token,
-    refName,
-  }: {
-    repository: string;
-    token: string;
-    refName: string;
-  }) {
+  constructor({ repository, token }: { repository: string; token: string }) {
     this.#repository = repository;
     this.#token = token;
-    this.#refName = refName;
   }
 
   static create(): GitHub {
-    const { GITHUB_REPOSITORY, GITHUB_TOKEN, GITHUB_REF_NAME } = process.env;
+    const { GITHUB_REPOSITORY, GITHUB_TOKEN } = process.env;
 
     assertNotEmptyString(GITHUB_REPOSITORY, "GITHUB_REPOSITORY");
     assertNotEmptyString(GITHUB_TOKEN, "GITHUB_TOKEN");
-    assertNotEmptyString(GITHUB_REF_NAME, "GITHUB_REF_NAME");
 
     return new this({
       repository: GITHUB_REPOSITORY,
       token: GITHUB_TOKEN,
-      refName: GITHUB_REF_NAME,
     });
   }
 
