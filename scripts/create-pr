@@ -2,6 +2,8 @@
 
 set -e
 
+TITLE="chore: add Standard.Site to blog posts"
+
 cd $GITHUB_WORKSPACE
 
 git config --global --add safe.directory $GITHUB_WORKSPACE
@@ -13,11 +15,11 @@ git remote set-url origin https://x-access-token:${GITHUB_TOKEN}@github.com/${GI
 
 git checkout -b chore/blog-to-standard-site
 git add .
-git commit -m "chore: add Standard.Site URIs to blog posts"
+git commit -m "$TITLE"
 git push origin chore/blog-to-standard-site
 
 gh pr create \
-  --title "chore: add Standard.Site URIs to blog posts" \
+  --title "$TITLE" \
   --body "Automated PR to add \`standard_site\` frontmatter field to new blog posts." \
   --base $GITHUB_REF_NAME \
   --head chore/blog-to-standard-site
