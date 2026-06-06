@@ -28,6 +28,7 @@ COPY tsconfig.json tsconfig.json
 COPY package.json package.json
 COPY bunfig.toml bunfig.toml
 COPY test-setup.ts test-setup.ts
+COPY scripts scripts
 
 # tests & build
 ENV NODE_ENV=production
