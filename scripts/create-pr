@@ -14,7 +14,9 @@ git remote set-url origin https://x-access-token:${GITHUB_TOKEN}@github.com/${GI
 BRANCH="chore/blog-to-standard-site"
 
 if git fetch origin $BRANCH 2>/dev/null; then
+  git stash
   git checkout --track origin/$BRANCH
+  git stash pop
 else
   git checkout -b $BRANCH
 fi
