@@ -85,7 +85,7 @@ describe("Blog", () => {
       expect(result.result.posts[0]?.frontmatter.path).toBe("/blog/hello-world");
       expect(result.result.posts[0]?.frontmatter.title).toBe("Hello World");
       expect(result.result.posts[0]?.frontmatter.description).toBe("A hello world post");
-      expect(result.result.posts[0]?.frontmatter.publishedAt).toBeDefined();
+      expect(result.result.posts[0]?.frontmatter.published_at).toBeDefined();
     });
 
     it("should return error if blog post has no valid frontmatter", async () => {
@@ -129,7 +129,7 @@ describe("Blog", () => {
       expect(result.result.posts).toHaveLength(2);
     });
 
-    it("should use current date as publishedAt", async () => {
+    it("should use current date as published_at", async () => {
       await writeFile(
         join(TEST_DIR, "dated.md"),
         frontmatter("/blog/dated", "Dated Post", "A dated post"),
@@ -150,7 +150,7 @@ describe("Blog", () => {
         return;
       }
 
-      const publishedAt = result.result.posts[0]?.frontmatter.publishedAt ?? "";
+      const publishedAt = result.result.posts[0]?.frontmatter.published_at ?? "";
       expect(publishedAt >= before).toBe(true);
       expect(publishedAt <= after).toBe(true);
     });
@@ -217,6 +217,27 @@ describe("Blog", () => {
         "__fixtures__/blog/without-standard-site.md",
       );
     });
+
+    it("should return blog post without description", async () => {
+      await writeFile(
+        join(TEST_DIR, "no-description.md"),
+        `---\npath: "/blog/no-description"\ntitle: "No Description"\n---`,
+      );
+
+      const result = await Blog.create().build({
+        files: ["__fixtures__/blog/no-description.md"],
+      });
+
+      expect(result.status).toBe("success");
+
+      if (result.status !== "success") {
+        expect(true).toBeFalsy();
+        return;
+      }
+
+      expect(result.result.posts).toHaveLength(1);
+      expect(result.result.posts[0]?.frontmatter.description).toBeUndefined();
+    });
   });
 
   describe("update", () => {
@@ -232,7 +253,7 @@ describe("Blog", () => {
               path: "/blog/update-test",
               title: "Update Test",
               description: "A test post",
-              publishedAt: "2026-06-05T00:00:00.000Z",
+              published_at: "2026-06-05T00:00:00.000Z",
               standard_site: "at://did:plc:xxx/site.standard.document/abc123",
             },
           },
@@ -260,7 +281,7 @@ describe("Blog", () => {
               path: "/blog/update-existing",
               title: "Update Existing",
               description: "A test post",
-              publishedAt: "2026-06-05T00:00:00.000Z",
+              published_at: "2026-06-05T00:00:00.000Z",
               standard_site: "at://did:plc:xxx/site.standard.document/new",
             },
           },

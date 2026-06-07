@@ -130,7 +130,7 @@ export class Blog {
         return { ...acc, ...obj };
       },
       {
-        publishedAt: new Date().toISOString(),
+        published_at: new Date().toISOString(),
       },
     );
 

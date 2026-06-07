@@ -15,7 +15,7 @@ describe("AtProto", () => {
           path: "/blog/post-one",
           title: "Post One",
           description: "First post",
-          publishedAt: "2026-06-05T00:00:00.000Z",
+          published_at: "2026-06-05T00:00:00.000Z",
         },
       },
       {
@@ -24,7 +24,7 @@ describe("AtProto", () => {
           path: "/blog/post-two",
           title: "Post Two",
           description: "Second post",
-          publishedAt: "2026-06-05T00:00:00.000Z",
+          published_at: "2026-06-05T00:00:00.000Z",
         },
       },
     ],
@@ -169,6 +169,76 @@ describe("AtProto", () => {
         "at://did:plc:fxmgj7lnas3ewnc3hmpx2vg6/site.standard.publication/3mnjy5srkem2h",
       );
       expect(body.record.publishedAt).toBe("2026-06-05T00:00:00.000Z");
+    });
+
+    it("should call createRecord without description if not set", async () => {
+      const fetchSpy = spyOn(globalThis, "fetch")
+        .mockResolvedValueOnce(new Response(JSON.stringify(mockSessionResponse), { status: 200 }))
+        .mockResolvedValueOnce(new Response(JSON.stringify(mockRecordResponse), { status: 200 }));
+
+      await AtProto.create().generateRecords({
+        posts: [
+          {
+            relativePath: "src/blog/no-desc.md",
+            frontmatter: {
+              path: "/blog/no-desc",
+              title: "No Description",
+              published_at: "2026-06-05T00:00:00.000Z",
+            },
+          },
+        ],
+      });
+
+      const [, options] = fetchSpy.mock.calls[1] as [string, RequestInit];
+      const body = JSON.parse(options.body as string);
+      expect(body.record.description).toBeUndefined();
+    });
+
+    it("should truncate title to max length", async () => {
+      const fetchSpy = spyOn(globalThis, "fetch")
+        .mockResolvedValueOnce(new Response(JSON.stringify(mockSessionResponse), { status: 200 }))
+        .mockResolvedValueOnce(new Response(JSON.stringify(mockRecordResponse), { status: 200 }));
+
+      await AtProto.create().generateRecords({
+        posts: [
+          {
+            relativePath: "src/blog/long-title.md",
+            frontmatter: {
+              path: "/blog/long-title",
+              title: "a".repeat(600),
+              published_at: "2026-06-05T00:00:00.000Z",
+            },
+          },
+        ],
+      });
+
+      const [, options] = fetchSpy.mock.calls[1] as [string, RequestInit];
+      const body = JSON.parse(options.body as string);
+      expect(body.record.title).toHaveLength(500);
+    });
+
+    it("should truncate description to max length", async () => {
+      const fetchSpy = spyOn(globalThis, "fetch")
+        .mockResolvedValueOnce(new Response(JSON.stringify(mockSessionResponse), { status: 200 }))
+        .mockResolvedValueOnce(new Response(JSON.stringify(mockRecordResponse), { status: 200 }));
+
+      await AtProto.create().generateRecords({
+        posts: [
+          {
+            relativePath: "src/blog/long-desc.md",
+            frontmatter: {
+              path: "/blog/long-desc",
+              title: "Title",
+              description: "b".repeat(4000),
+              published_at: "2026-06-05T00:00:00.000Z",
+            },
+          },
+        ],
+      });
+
+      const [, options] = fetchSpy.mock.calls[1] as [string, RequestInit];
+      const body = JSON.parse(options.body as string);
+      expect(body.record.description).toHaveLength(3000);
     });
 
     it("should return success if all records are created", async () => {

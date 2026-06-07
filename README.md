@@ -75,7 +75,7 @@ Before setting up this action you'll need:
 
 ### Blog post frontmatter
 
-Your blog posts must include `path`, `title`, and `description` in their frontmatter:
+Your blog posts must include `path` and `title` in their frontmatter:
 
 ```markdown
 ---
@@ -84,6 +84,8 @@ title: "My Post"
 description: "A short description of my post."
 ---
 ```
+
+`description` and `published_at` are optional. The latter defaults to the current timestamp if not set, as required by the record [schema](https://standard.site/docs/lexicons/document#schema).
 
 ## Outcome
 
@@ -124,7 +126,7 @@ jobs:
         with:
           persist-credentials: false
 
-      - uses: peterpeterparker/blog-to-standard-site-action@02e25338609088128703b4f1c2a04f5df673ab25 # v0.0.4
+      - uses: peterpeterparker/blog-to-standard-site-action@7a0266d9fbd6c01d05955054def785668ad7e27a # v0.0.5
         with:
           blog_posts_path: "src/blog"
           github_token: ${{ secrets.GITHUB_TOKEN }}
