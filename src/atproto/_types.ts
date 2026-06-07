@@ -34,7 +34,7 @@ export const AtProtoCreateSessionCodec = z.codec(AtProtoCreateSessionArgsSchema,
 });
 
 export const AtProtoCreateRecordCodec = z.codec(AtProtoCreateRecordArgsSchema, z.string(), {
-  decode: ({ did, publicationRkey, published_at, description, ...frontmatter }) =>
+  decode: ({ did, publicationRkey, published_at, title, description, ...frontmatter }) =>
     // https://github.com/bluesky-social/atproto/blob/main/lexicons/com/atproto/repo/createRecord.json
     JSON.stringify({
       repo: did,
@@ -45,7 +45,10 @@ export const AtProtoCreateRecordCodec = z.codec(AtProtoCreateRecordArgsSchema, z
         // https://standard.site/docs/lexicons/document#schema
         ...frontmatter,
         publishedAt: published_at,
-        ...(notEmptyString(description) && { description }),
+        title: title.trim().slice(0, 500),
+        ...(notEmptyString(description?.trim()) && {
+          description: description.trim().slice(0, 3000),
+        }),
       },
     }),
   encode: (json) => JSON.parse(json),
