@@ -84,6 +84,22 @@ describe("Action", () => {
       expect(result.status).toBe("success");
     });
 
+    it("should return success if no posts need Standard.Site records", async () => {
+      spyOn(GitHub.prototype, "findAddedFiles").mockResolvedValueOnce({
+        status: "success",
+        result: { files: ["__fixtures__/blog/hello-world.md"] },
+      });
+
+      spyOn(Blog.prototype, "build").mockResolvedValueOnce({
+        status: "success",
+        result: { posts: [] },
+      });
+
+      const result = await run();
+
+      expect(result.status).toBe("success");
+    });
+
     it("should return error if blog build fails", async () => {
       spyOn(GitHub.prototype, "findAddedFiles").mockResolvedValueOnce({
         status: "success",
