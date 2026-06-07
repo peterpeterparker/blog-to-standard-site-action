@@ -172,7 +172,7 @@ describe("Blog", () => {
       expect(result.err).toBeInstanceOf(NoBlogPostsError);
     });
 
-    it("should skip posts that already have standard_site set", async () => {
+    it("should return empty posts if all posts already have standard_site set", async () => {
       await writeFile(
         join(TEST_DIR, "with-standard-site.md"),
         `---\npath: "/blog/with-standard-site"\ntitle: "With Standard Site"\ndescription: "A post"\nstandard_site: "at://did:plc:xxx/site.standard.document/abc123"\n---`,
@@ -182,12 +182,12 @@ describe("Blog", () => {
         files: ["__fixtures__/blog/with-standard-site.md"],
       });
 
-      expect(result.status).toBe("error");
-      if (result.status !== "error") {
+      expect(result.status).toBe("success");
+      if (result.status !== "success") {
         expect(true).toBeFalsy();
         return;
       }
-      expect(result.err).toBeInstanceOf(NoBlogPostsError);
+      expect(result.result.posts).toHaveLength(0);
     });
 
     it("should only return posts without standard_site set", async () => {
