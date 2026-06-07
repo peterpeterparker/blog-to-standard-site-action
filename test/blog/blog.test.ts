@@ -217,6 +217,27 @@ describe("Blog", () => {
         "__fixtures__/blog/without-standard-site.md",
       );
     });
+
+    it("should return blog post without description", async () => {
+      await writeFile(
+        join(TEST_DIR, "no-description.md"),
+        `---\npath: "/blog/no-description"\ntitle: "No Description"\n---`,
+      );
+
+      const result = await Blog.create().build({
+        files: ["__fixtures__/blog/no-description.md"],
+      });
+
+      expect(result.status).toBe("success");
+
+      if (result.status !== "success") {
+        expect(true).toBeFalsy();
+        return;
+      }
+
+      expect(result.result.posts).toHaveLength(1);
+      expect(result.result.posts[0]?.frontmatter.description).toBeUndefined();
+    });
   });
 
   describe("update", () => {

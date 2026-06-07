@@ -171,6 +171,29 @@ describe("AtProto", () => {
       expect(body.record.publishedAt).toBe("2026-06-05T00:00:00.000Z");
     });
 
+    it("should call createRecord without description if not set", async () => {
+      const fetchSpy = spyOn(globalThis, "fetch")
+        .mockResolvedValueOnce(new Response(JSON.stringify(mockSessionResponse), { status: 200 }))
+        .mockResolvedValueOnce(new Response(JSON.stringify(mockRecordResponse), { status: 200 }));
+
+      await AtProto.create().generateRecords({
+        posts: [
+          {
+            relativePath: "src/blog/no-desc.md",
+            frontmatter: {
+              path: "/blog/no-desc",
+              title: "No Description",
+              published_at: "2026-06-05T00:00:00.000Z",
+            },
+          },
+        ],
+      });
+
+      const [, options] = fetchSpy.mock.calls[1] as [string, RequestInit];
+      const body = JSON.parse(options.body as string);
+      expect(body.record.description).toBeUndefined();
+    });
+
     it("should return success if all records are created", async () => {
       spyOn(globalThis, "fetch")
         .mockResolvedValueOnce(new Response(JSON.stringify(mockSessionResponse), { status: 200 }))

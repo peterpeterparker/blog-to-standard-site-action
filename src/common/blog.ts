@@ -5,7 +5,7 @@ import { RelativePathSchema } from "./files.ts";
 export const FrontmatterSchema = z.object({
   path: NotEmptyStringSchema,
   title: NotEmptyStringSchema,
-  description: NotEmptyStringSchema,
+  description: NotEmptyStringSchema.optional(),
   published_at: z.iso.datetime(),
   standard_site: NotEmptyStringSchema.optional(),
 });
