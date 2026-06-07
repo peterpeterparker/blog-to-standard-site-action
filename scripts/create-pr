@@ -11,26 +11,15 @@ git config --global user.name "github-actions[bot]"
 
 git remote set-url origin https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git
 
-BRANCH="chore/blog-to-standard-site"
+BRANCH="chore/blog-to-standard-site-${GITHUB_RUN_ID}"
 
-if git fetch origin $BRANCH 2>/dev/null; then
-  git stash
-  git checkout --track origin/$BRANCH
-  git stash pop
-else
-  git checkout -b $BRANCH
-fi
-
+git checkout -b $BRANCH
 git add .
 git commit -m "$TITLE"
 git push origin $BRANCH
 
-EXISTING_PR=$(gh pr list --head $BRANCH --base $GITHUB_REF_NAME --json number -q '.[0].number')
-
-if [ -z "$EXISTING_PR" ]; then
-  gh pr create \
+gh pr create \
     --title "$TITLE" \
     --body "Automated PR to add \`standard_site\` frontmatter field to new blog posts." \
     --base $GITHUB_REF_NAME \
     --head $BRANCH
-fi
