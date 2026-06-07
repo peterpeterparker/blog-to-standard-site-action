@@ -92,15 +92,6 @@ export class Blog {
         console.info(`Skipping ${relativePath}: standard_site already set.`),
       );
 
-      if (postsToSubmit.length === 0) {
-        return {
-          status: "error",
-          err: new NoBlogPostsError(
-            "No blog posts without an existing Standard.Site record found.",
-          ),
-        };
-      }
-
       return { status: "success", result: postsToSubmit };
     } catch (err: unknown) {
       return { status: "error", err };

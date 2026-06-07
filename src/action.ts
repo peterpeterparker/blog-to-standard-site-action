@@ -33,6 +33,11 @@ export const run = async (): Promise<Result<void>> => {
 
   const { result: blogData } = blogPostsResult;
 
+  if (blogData.posts.length === 0) {
+    console.info("No blog posts without an existing Standard.Site record found.");
+    return { status: "success", result: undefined };
+  }
+
   // 3. Generate AtProto records
 
   const recordsResult = await AtProto.create().generateRecords(blogData);
