@@ -15,7 +15,7 @@ export type AtProtoCreateSessionResponse = z.infer<typeof AtProtoCreateSessionRe
 export const AtProtoCreateRecordArgsSchema = z.strictObject({
   did: z.string(),
   publicationRkey: z.string(),
-  ...FrontmatterSchema.shape,
+  ...FrontmatterSchema.omit({ standard_site: true }).shape,
 });
 
 export const AtProtoCreateRecordResponseSchema = z.object({
@@ -33,7 +33,7 @@ export const AtProtoCreateSessionCodec = z.codec(AtProtoCreateSessionArgsSchema,
 });
 
 export const AtProtoCreateRecordCodec = z.codec(AtProtoCreateRecordArgsSchema, z.string(), {
-  decode: ({ did, publicationRkey, ...blogPost }) =>
+  decode: ({ did, publicationRkey, published_at, ...frontmatter }) =>
     // https://github.com/bluesky-social/atproto/blob/main/lexicons/com/atproto/repo/createRecord.json
     JSON.stringify({
       repo: did,
@@ -41,7 +41,9 @@ export const AtProtoCreateRecordCodec = z.codec(AtProtoCreateRecordArgsSchema, z
       record: {
         $type: "site.standard.document",
         site: `at://${did}/site.standard.publication/${publicationRkey}`,
-        ...blogPost,
+        // https://standard.site/docs/lexicons/document#schema
+        ...frontmatter,
+        publishedAt: published_at,
       },
     }),
   encode: (json) => JSON.parse(json),
