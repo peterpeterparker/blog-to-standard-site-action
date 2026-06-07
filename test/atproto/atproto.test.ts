@@ -15,7 +15,7 @@ describe("AtProto", () => {
           path: "/blog/post-one",
           title: "Post One",
           description: "First post",
-          publishedAt: "2026-06-05T00:00:00.000Z",
+          published_at: "2026-06-05T00:00:00.000Z",
         },
       },
       {
@@ -24,7 +24,7 @@ describe("AtProto", () => {
           path: "/blog/post-two",
           title: "Post Two",
           description: "Second post",
-          publishedAt: "2026-06-05T00:00:00.000Z",
+          published_at: "2026-06-05T00:00:00.000Z",
         },
       },
     ],
