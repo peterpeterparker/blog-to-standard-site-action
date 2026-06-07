@@ -75,7 +75,7 @@ Before setting up this action you'll need:
 
 ### Blog post frontmatter
 
-Your blog posts must include `path`, `title`, and `description` in their frontmatter:
+Your blog posts must include `path` and `title` in their frontmatter:
 
 ```markdown
 ---
@@ -84,6 +84,8 @@ title: "My Post"
 description: "A short description of my post."
 ---
 ```
+
+`description` and `published_at` are optional. The latter defaults to the current timestamp if not set, as required by the record [schema](https://standard.site/docs/lexicons/document#schema).
 
 ## Outcome
 
